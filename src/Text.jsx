@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-// const cipherOutput = "A";
-const Text = ({ keyInput, setKeyInput, plInput, setPlInput , cipherOutput}) => {
-  console.log({ keyInput, plInput });
+const Text = ({ keyInput, setKeyInput, plInput, setPlInput, cipherOutput }) => {
   return (
     <>
       <div id="text" className="w-[100vw] text-center h-[250px]">
@@ -10,7 +8,7 @@ const Text = ({ keyInput, setKeyInput, plInput, setPlInput , cipherOutput}) => {
           className="h-[80px] flex flex-row gap-x-4 justify-center items-center"
         >
           <label htmlFor="key" className="text-[40px]">
-            Key:{" "}
+            Key:
           </label>
           <input
             type="text"
@@ -26,7 +24,7 @@ const Text = ({ keyInput, setKeyInput, plInput, setPlInput , cipherOutput}) => {
           className="h-[80px] flex flex-row gap-x-4 justify-center items-center"
         >
           <label htmlFor="plaintext" className="text-[40px]">
-            Plaintext:{" "}
+            Plaintext:
           </label>
           <input
             type="text"
@@ -38,9 +36,12 @@ const Text = ({ keyInput, setKeyInput, plInput, setPlInput , cipherOutput}) => {
           />
         </div>
         {cipherOutput.length ? (
-          <div id="ciphertext">
+          <div
+            id="ciphertext"
+            className="flex flex-row gap-x-4 justify-center items-center"
+          >
             <label htmlFor="ciphertext" className="text-[40px]">
-              Ciphertext:{" "}
+              Ciphertext:
             </label>
             <span id="ciphertext" className="text-[40px]">
               {cipherOutput}

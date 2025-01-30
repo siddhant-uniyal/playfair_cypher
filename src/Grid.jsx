@@ -29,17 +29,6 @@ const Grid = ({ keyInput, plInput , setCipherOutput}) => {
   };
 
   let cleanedKey = [...new Set(keyInput.replace(/J/g, "I"))].join("");
-  let digramPl = [];
-  for (let i = 0; i < plInput.length; ) {
-    digramPl.push(plInput[i]);
-    if (i + 1 == plInput.length || plInput[i] == plInput[i + 1]) {
-      digramPl.push("X");
-      ++i;
-    } else {
-      digramPl.push(plInput[i + 1]);
-      i += 2;
-    }
-  }
 
   useEffect(() => {
     if (keyInput.length > 0) {
