@@ -7,6 +7,7 @@ const App = () => {
   const [keyInput , setKeyInput] = useState("");
   const [plInput , setPlInput] = useState("");
   const [cipherOutput , setCipherOutput] = useState("");
+  
   return (
     <div id="body" className="bg-slate-600 h-screen flex flex-col items-center">
     <Text keyInput={keyInput} setKeyInput={setKeyInput} plInput={plInput} setPlInput={setPlInput} cipherOutput={cipherOutput}></Text>

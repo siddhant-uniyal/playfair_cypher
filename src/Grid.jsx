@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-const N = 5;
 function nextChar(key, insert, ptr) {
   if (ptr == key.length) insert = String.fromCharCode(insert.charCodeAt(0) + 1);
   else {
@@ -20,7 +19,7 @@ function intializeCells() {
   }
   return cells;
 }
-const Grid = ({ keyInput, plInput , setCipherOutput}) => {
+const Grid = ({ keyInput, plInput, setCipherOutput }) => {
   const [cells, setCells] = useState(() => intializeCells());
   const updateCell = (index, element) => {
     setCells((prevCells) =>
@@ -28,63 +27,60 @@ const Grid = ({ keyInput, plInput , setCipherOutput}) => {
     );
   };
 
-  let cleanedKey = [...new Set(keyInput.replace(/J/g, "I"))].join("");
+  const N = 5;
+  const club = "J";
+  let cleanedKey = [
+    ...new Set(keyInput.replace(new RegExp(club, "g"), "I")),
+  ].join("");
 
   useEffect(() => {
-    if (keyInput.length > 0) {
-      // console.log({keyInput , cleanedKey})
-      var matrix = Array.from({ length: N }, () => new Array(N).fill(" "));
-      var charToInd = new Array(26).fill(0);
-      var ptr = 0,
-        vis = 0;
-      var insert = " ";
-      const club = "J";
-      // console.log(cleanedKey, plInput, cipherOutput);
-      insert = cleanedKey[0];
-      for (let i = 0; i < N; ++i) {
-        for (let j = 0; j < N; ++j) {
-          while (
-            insert == club ||
-            vis & (1 << (insert.charCodeAt(0) - "A".charCodeAt(0)))
-          )
-            [insert, ptr] = nextChar(cleanedKey, insert, ptr);
-          vis |= 1 << (insert.charCodeAt(0) - "A".charCodeAt(0));
-          charToInd[insert.charCodeAt(0) - "A".charCodeAt(0)] = i * N + j;
-          matrix[i][j] = insert;
-          updateCell(i * N + j, insert);
+    var matrix = Array.from({ length: N }, () => new Array(N).fill(" "));
+    var charToInd = new Array(26).fill(0);
+    var ptr = 0,
+      vis = 0;
+    var insert = " ";
+    insert = cleanedKey.length ? cleanedKey[0] : "A";
+    for (let i = 0; i < N; ++i) {
+      for (let j = 0; j < N; ++j) {
+        while (
+          insert == club ||
+          vis & (1 << (insert.charCodeAt(0) - "A".charCodeAt(0)))
+        )
           [insert, ptr] = nextChar(cleanedKey, insert, ptr);
-        }
-      }
-      charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] =
-        charToInd["I".charCodeAt(0) - "A".charCodeAt(0)];
-
-      if (plInput.length > 0) {
-        var ciphertext = "";
-        for (let i = 0; i < plInput.length; ) {
-          var f = plInput[i];
-          var s = i + 1 == plInput.length ? "X" : plInput[i + 1];
-          if (s == f) (s = "X"), ++i;
-          else i += 2;
-          var fVal = charToInd[f.charCodeAt(0) - "A".charCodeAt(0)];
-          var sVal = charToInd[s.charCodeAt(0) - "A".charCodeAt(0)];
-          var fX = Math.floor(fVal / N),
-            fY = fVal % N;
-          var sX = Math.floor(sVal / N),
-            sY = sVal % N;
-          if (fX == sX) {
-            ciphertext += matrix[fX][(fY + 1) % N];
-            ciphertext += matrix[sX][(sY + 1) % N];
-          } else if (fY == sY) {
-            ciphertext += matrix[(fX + 1) % N][fY];
-            ciphertext += matrix[(sX + 1) % N][sY];
-          } else {
-            ciphertext += matrix[fX][sY];
-            ciphertext += matrix[sX][fY];
-          }
-        }
-        setCipherOutput(ciphertext);
+        vis |= 1 << (insert.charCodeAt(0) - "A".charCodeAt(0));
+        charToInd[insert.charCodeAt(0) - "A".charCodeAt(0)] = i * N + j;
+        matrix[i][j] = insert;
+        updateCell(i * N + j, insert);
+        [insert, ptr] = nextChar(cleanedKey, insert, ptr);
       }
     }
+    charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] =
+      charToInd["I".charCodeAt(0) - "A".charCodeAt(0)];
+
+    var ciphertext = "";
+    for (let i = 0; i < plInput.length; ) {
+      var f = plInput[i];
+      var s = i + 1 == plInput.length ? "X" : plInput[i + 1];
+      if (s == f) (s = "X"), ++i;
+      else i += 2;
+      var fVal = charToInd[f.charCodeAt(0) - "A".charCodeAt(0)];
+      var sVal = charToInd[s.charCodeAt(0) - "A".charCodeAt(0)];
+      var fX = Math.floor(fVal / N),
+        fY = fVal % N;
+      var sX = Math.floor(sVal / N),
+        sY = sVal % N;
+      if (fX == sX) {
+        ciphertext += matrix[fX][(fY + 1) % N];
+        ciphertext += matrix[sX][(sY + 1) % N];
+      } else if (fY == sY) {
+        ciphertext += matrix[(fX + 1) % N][fY];
+        ciphertext += matrix[(sX + 1) % N][sY];
+      } else {
+        ciphertext += matrix[fX][sY];
+        ciphertext += matrix[sX][fY];
+      }
+    }
+    setCipherOutput(ciphertext);
   }, [keyInput, plInput]);
 
   return (
