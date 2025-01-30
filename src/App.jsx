@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
-import Text from "./Text";
-import Grid from "./Grid";
-import Bigram from "./Bigram";
+import Text from "./components/Text";
+import Grid from "./components/Grid";
+import Bigram from "./components/Bigram";
 const App = () => {
   const [keyInput , setKeyInput] = useState("");
   const [plInput , setPlInput] = useState("");
