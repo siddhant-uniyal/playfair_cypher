@@ -11,7 +11,7 @@ function nextChar(key, insert, ptr) {
   }
   return [insert, ptr];
 }
-function intializeCells() {
+function intializeCells(N) {
   let cells = [];
   for (let i = 0; i <= N * N; ++i) {
     if (i + 65 == "J".charCodeAt(0)) continue;
@@ -20,15 +20,15 @@ function intializeCells() {
   return cells;
 }
 const Grid = ({ keyInput, plInput, setCipherOutput }) => {
-  const [cells, setCells] = useState(() => intializeCells());
+  const N = 5;
+  const club = "J";
+  const [cells, setCells] = useState(() => intializeCells(N));
   const updateCell = (index, element) => {
     setCells((prevCells) =>
       prevCells.map((item, idx) => (idx == index ? element : item))
     );
   };
 
-  const N = 5;
-  const club = "J";
   let cleanedKey = [
     ...new Set(keyInput.replace(new RegExp(club, "g"), "I")),
   ].join("");
@@ -36,8 +36,7 @@ const Grid = ({ keyInput, plInput, setCipherOutput }) => {
   useEffect(() => {
     var matrix = Array.from({ length: N }, () => new Array(N).fill(" "));
     var charToInd = new Array(26).fill(0);
-    var ptr = 0,
-      vis = 0;
+    var ptr = 0 , vis = 0;
     var insert = " ";
     insert = cleanedKey.length ? cleanedKey[0] : "A";
     for (let i = 0; i < N; ++i) {
@@ -54,9 +53,7 @@ const Grid = ({ keyInput, plInput, setCipherOutput }) => {
         [insert, ptr] = nextChar(cleanedKey, insert, ptr);
       }
     }
-    charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] =
-      charToInd["I".charCodeAt(0) - "A".charCodeAt(0)];
-
+    charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] = charToInd["I".charCodeAt(0) - "A".charCodeAt(0)];
     var ciphertext = "";
     for (let i = 0; i < plInput.length; ) {
       var f = plInput[i];
