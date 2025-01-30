@@ -5,7 +5,12 @@ function nextChar(key, insert, ptr) {
   if (ptr == key.length) insert = String.fromCharCode(insert.charCodeAt(0) + 1);
   else {
     ++ptr;
-    insert = ptr == key.length ? "A" : key[ptr];
+    if(ptr == key.length){
+      insert = 'A';
+    }
+    else{
+      insert = key[ptr];
+    }
   }
   return [insert, ptr];
 }
@@ -34,28 +39,31 @@ const App = () => {
     setDigram((prevDigram) => prevDigram.map((item , idx) => str[idx]))
   }
 
+  let cleanedKey = [...new Set(keyInput.replace(/J/g , 'I'))].join('')
+
   useEffect(() => {
     if (keyInput.length > 0) {
+      // console.log({keyInput , cleanedKey})
       var matrix = Array.from({ length: N }, () => new Array(N).fill(" "));
       var charToInd = new Array(26).fill(0);
       var ptr = 0,
         vis = 0;
       var insert = " ";
       const club = "J";
-      console.log(keyInput, plInput, cipherOutput);
-      insert = keyInput[0];
+      // console.log(cleanedKey, plInput, cipherOutput);
+      insert = cleanedKey[0];
       for (let i = 0; i < N; ++i) {
         for (let j = 0; j < N; ++j) {
           while (
             insert == club ||
             vis & (1 << (insert.charCodeAt(0) - "A".charCodeAt(0)))
           )
-            [insert, ptr] = nextChar(keyInput, insert, ptr);
+            [insert, ptr] = nextChar(cleanedKey, insert, ptr);
           vis |= 1 << (insert.charCodeAt(0) - "A".charCodeAt(0));
           charToInd[insert.charCodeAt(0) - "A".charCodeAt(0)] = i * N + j;
           matrix[i][j] = insert;
           updateCell(i * N + j, insert);
-          [insert, ptr] = nextChar(keyInput, insert, ptr);
+          [insert, ptr] = nextChar(cleanedKey, insert, ptr);
         }
       }
       charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] =
@@ -86,7 +94,6 @@ const App = () => {
         }
       }
       setCipherOutput(ciphertext);
-    
     }
   }, [keyInput, plInput]);
 
@@ -120,24 +127,27 @@ const App = () => {
         id="grid"
         className = "grid grid-cols-5 max-w-[20vw] mt-[30px] mx-auto"
       >
-        {cells.map((item, index) => (
-          <div
-            key={index}
-            className =  {`border border-black text-center p-[10px] ${index < keyInput.length ? 'bg-yellow-300' : 'bg-white'}`}
-          >
-            {item}
-          </div>
-        ))}
+        {
+     cells.map((item, index) => (
+
+            <div
+                key={index}
+                className={`border border-black text-center p-[10px] ${index < cleanedKey.length ? 'bg-yellow-300' : 'bg-white'}`}
+            >
+                {item}
+            </div>
+        
+     ))
+}
 
       </div>
       <div id="digrams"
         className="mx-auto max-w-[60vw] text-center text-xl mt-[30px]">
         {[...plInput].map((item , index) => {
-          if(!(index&1)){
-          return <span className="mr-[5px]" key={index}>[{plInput[index]}{index + 1 == plInput.length ? 'X' : plInput[index + 1]}]</span>
+          return <span className="mr-[5px]" key={index}>[{item}{index + 1 == plInput.length || plInput[index + 1] == item ? 'X' : plInput[index + 1]}]</span>
           return <span onClick={updateDigram("AB")}className="mr-[5px]" key={index}>[{plInput[index]}{index + 1 == plInput.length ? 'X' : plInput[index + 1]}]</span>
-          }
-        })}
+        })
+        }
       </div>
       <div id="digram" className="max-w-[60vw] mx-auto text-center mt-[30px]">
         {
