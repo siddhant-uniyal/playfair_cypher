@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import useAppContext from "../hooks/use-app-context";
 function nextChar(key, insert, ptr) {
   if (ptr == key.length) insert = String.fromCharCode(insert.charCodeAt(0) + 1);
   else {
@@ -19,7 +20,8 @@ function intializeCells(N) {
   }
   return cells;
 }
-const Grid = ({ keyInput, plInput, setCipherOutput }) => {
+const Grid = () => {
+  const { keyInput, plInput, setCipherOutput } = useAppContext();
   const N = 5;
   const club = "J";
   const [cells, setCells] = useState(() => intializeCells(N));
@@ -36,7 +38,8 @@ const Grid = ({ keyInput, plInput, setCipherOutput }) => {
   useEffect(() => {
     var matrix = Array.from({ length: N }, () => new Array(N).fill(" "));
     var charToInd = new Array(26).fill(0);
-    var ptr = 0 , vis = 0;
+    var ptr = 0,
+      vis = 0;
     var insert = " ";
     insert = cleanedKey.length ? cleanedKey[0] : "A";
     for (let i = 0; i < N; ++i) {
@@ -53,7 +56,8 @@ const Grid = ({ keyInput, plInput, setCipherOutput }) => {
         [insert, ptr] = nextChar(cleanedKey, insert, ptr);
       }
     }
-    charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] = charToInd["I".charCodeAt(0) - "A".charCodeAt(0)];
+    charToInd["J".charCodeAt(0) - "A".charCodeAt(0)] =
+      charToInd["I".charCodeAt(0) - "A".charCodeAt(0)];
     var ciphertext = "";
     for (let i = 0; i < plInput.length; ) {
       var f = plInput[i];

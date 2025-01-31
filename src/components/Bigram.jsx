@@ -1,6 +1,8 @@
 import React from "react";
+import useAppContext from "../hooks/use-app-context";
 
-const Bigram = ({ plInput }) => {
+const Bigram = () => {
+  const { plInput } = useAppContext();
   let bigramPl = [];
   for (let i = 0; i < plInput.length; ) {
     bigramPl.push(plInput[i]);
