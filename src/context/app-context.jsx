@@ -2,10 +2,11 @@ import { createContext, useState } from "react";
 
 export const AppContext = createContext();
 
-const AppProvider = ({ children }) => {
+const AppContextProvider = ({ children }) => {
   const [keyInput, setKeyInput] = useState("");
   const [plInput, setPlInput] = useState("");
   const [cipherOutput, setCipherOutput] = useState("");
+  const [bigramIndex , setBigramIndex] = useState(25);
 
   return (
     <AppContext.Provider
@@ -16,10 +17,12 @@ const AppProvider = ({ children }) => {
         setPlInput,
         cipherOutput,
         setCipherOutput,
+        bigramIndex,
+        setBigramIndex,
       }}
     >
       {children}
     </AppContext.Provider>
   );
 };
-export default AppProvider;
+export default AppContextProvider;

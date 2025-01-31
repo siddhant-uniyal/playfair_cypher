@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useAppContext from "../hooks/use-app-context";
+import { createBigramPl } from "../utils/bigram";
 function nextChar(key, insert, ptr) {
   if (ptr == key.length) insert = String.fromCharCode(insert.charCodeAt(0) + 1);
   else {
@@ -21,15 +22,61 @@ function intializeCells(N) {
   return cells;
 }
 const Grid = () => {
-  const { keyInput, plInput, setCipherOutput } = useAppContext();
+  const { keyInput, plInput, setCipherOutput, bigramIndex, cipherOutput } =
+    useAppContext();
+  // console.log(bigramIndex);
+  const bigramPl = createBigramPl(plInput);
   const N = 5;
   const club = "J";
+  const f = bigramPl[bigramIndex] == 'J' ? 'I' : bigramPl[bigramIndex],
+    s = bigramPl[bigramIndex + 1] == 'J' ? 'I' : bigramPl[bigramIndex + 1];
+
+  // console.log({ f, s });
   const [cells, setCells] = useState(() => intializeCells(N));
   const updateCell = (index, element) => {
     setCells((prevCells) =>
       prevCells.map((item, idx) => (idx == index ? element : item))
     );
   };
+  // const canvasRef = useRef();
+
+  // useEffect(()=>{
+  //   const ctx = canvasRef.current.getContext("2d");
+  //   ctx.clearRect(0 , 0 , 500 , 500);
+  //   for(let i = 0 ; i < 2 ; ++i){
+  //     const offsetY = i ? 20 : -20;
+  //     let ff = bigramPl[bigramIndex + i] , ss = cipherOutput[bigramIndex + i]
+  //   // s = cipherOutput[bigramIndex]
+  //   // let ff = f , ss = cipherOutput[bigramIndex]
+  //   // let fff = s , sss = cipherOutput[bigramIndex + 1]
+  //   // console.log({ff , ss , fff , sss})
+  //   // console.log({ff , ss})
+  //   let fX , fY , sX , sY;
+  //   for(let i = 0 ; i < N*N ; ++i){
+  //     if(cells[i] === ff){
+  //       fX = document.getElementById(`cell-${i}`).getBoundingClientRect().x - canvasRef.current.getBoundingClientRect().x;
+  //       fY = document.getElementById(`cell-${i}`).getBoundingClientRect().y - canvasRef.current.getBoundingClientRect().y;
+  //       // fX = document.getElementById(`cell-${i}`).getBoundingClientRect().x
+  //       // fY = document.getElementById(`cell-${i}`).getBoundingClientRect().y
+  //     }
+  //     else if(cells[i] === ss){
+  //       sX = document.getElementById(`cell-${i}`).getBoundingClientRect().x - canvasRef.current.getBoundingClientRect().x;
+  //       sY = document.getElementById(`cell-${i}`).getBoundingClientRect().y - canvasRef.current.getBoundingClientRect().y;
+  //       // sX = document.getElementById(`cell-${i}`).getBoundingClientRect().x
+  //       // sY = document.getElementById(`cell-${i}`).getBoundingClientRect().y
+  //     }
+  //   }
+  //   // console.log({fX , fY , sX , sY});
+  //   // const canvas = document.getElementById
+  //   // ctx.clearRect(0 , 0 , 500 , 500);
+  //   ctx.beginPath();
+  //   //i = 0 -> y - 20
+  //   //i = 1 -> y + 20
+  //   ctx.moveTo(fX + 60, fY + offsetY );
+  //   ctx.lineTo(sX + 60, sY + offsetY);
+  //   ctx.stroke();
+  // }
+  // } , [bigramIndex])
 
   let cleanedKey = [
     ...new Set(keyInput.replace(new RegExp(club, "g"), "I")),
@@ -85,17 +132,56 @@ const Grid = () => {
   }, [keyInput, plInput]);
 
   return (
-    <div id="grid" className="grid grid-cols-5 w-[250px] h-[250px]">
-      {cells.map((item, index) => (
-        <div
-          key={index}
-          className={`border border-black flex items-center justify-center py-[10px] ${
-            index < cleanedKey.length ? "bg-yellow-300" : "bg-slate-400"
-          }`}
-        >
-          {item}
-        </div>
-      ))}
+    <div id="grid" className="grid grid-cols-5 size-[250px] relative">
+      {/* <canvas ref={canvasRef} className="absolute top-0 right-0 size-full" /> */}
+      {cells.map((item, index) => {
+        const isSelectedBigram = (item === f || item === s) && bigramIndex >= 0;
+        const keyFinished = index < cleanedKey.length;
+        const isTargetCell =
+          (item === cipherOutput[bigramIndex] ||
+            item === cipherOutput[bigramIndex + 1]) &&
+          bigramIndex >= 0;
+        const isFirstIndexBigram = item === f && bigramIndex >= 0;
+        const isSecondIndexBigram = item === s && bigramIndex >= 0;
+        const isFirstIndexTarget = bigramIndex >= 0 && item === cipherOutput[bigramIndex];
+        const isSecondIndexTarget = bigramIndex >= 0 && item === cipherOutput[bigramIndex + 1];
+        return (
+          <div
+            key={index}
+            id={`cell-${index}`}
+            className={
+              `border border-black flex items-center justify-center py-[10px] relative text-xl 
+              ${
+                keyFinished ? "bg-green-200" : "bg-slate-400"
+              }
+              ${
+                isSelectedBigram && " border-[2px] border-red-600 text-red-600"
+              }
+              ${
+                isTargetCell && " border-[2px] border-blue-700 text-blue-700"
+              }
+              `
+            }
+          >
+            {item}
+          {
+            isSelectedBigram && isTargetCell && (<div className="absolute inset-[1px] border-[2px] border-blue-700"></div>)
+          }
+          {
+            isSelectedBigram && isFirstIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs">1</span>)
+          }
+          {
+            isSelectedBigram && isSecondIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs">2</span>)
+          }
+          {
+            isTargetCell && isFirstIndexTarget && (<span className="absolute top-[60%] right-[0%] bottom-[0%] left-[10%] text-xs text-blue-700">1</span>)
+          }
+          {
+            isTargetCell && isSecondIndexTarget && (<span className="absolute top-[60%] right-[0%] bottom-[0%] left-[10%] text-xs text-blue-700">2</span>)
+          }
+          </div>
+        );
+      })}
     </div>
   );
 };
