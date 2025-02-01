@@ -12,5 +12,5 @@ export const createBigramPl = (plInput) => {
         i += 2;
       }
     }
-      return bigramPl
+    return bigramPl
 }

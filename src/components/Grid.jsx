@@ -22,8 +22,8 @@ function intializeCells(N) {
   return cells;
 }
 const Grid = () => {
-  const { keyInput, plInput, setCipherOutput, bigramIndex, cipherOutput } =
-    useAppContext();
+  const { keyInput, plInput, setCipherOutput, bigramIndex, cipherOutput } = useAppContext();
+  const gridRef = useRef(null);
   // console.log(bigramIndex);
   const bigramPl = createBigramPl(plInput);
   const N = 5;
@@ -38,45 +38,117 @@ const Grid = () => {
       prevCells.map((item, idx) => (idx == index ? element : item))
     );
   };
-  // const canvasRef = useRef();
 
-  // useEffect(()=>{
-  //   const ctx = canvasRef.current.getContext("2d");
-  //   ctx.clearRect(0 , 0 , 500 , 500);
-  //   for(let i = 0 ; i < 2 ; ++i){
-  //     const offsetY = i ? 20 : -20;
-  //     let ff = bigramPl[bigramIndex + i] , ss = cipherOutput[bigramIndex + i]
-  //   // s = cipherOutput[bigramIndex]
-  //   // let ff = f , ss = cipherOutput[bigramIndex]
-  //   // let fff = s , sss = cipherOutput[bigramIndex + 1]
-  //   // console.log({ff , ss , fff , sss})
-  //   // console.log({ff , ss})
-  //   let fX , fY , sX , sY;
-  //   for(let i = 0 ; i < N*N ; ++i){
-  //     if(cells[i] === ff){
-  //       fX = document.getElementById(`cell-${i}`).getBoundingClientRect().x - canvasRef.current.getBoundingClientRect().x;
-  //       fY = document.getElementById(`cell-${i}`).getBoundingClientRect().y - canvasRef.current.getBoundingClientRect().y;
-  //       // fX = document.getElementById(`cell-${i}`).getBoundingClientRect().x
-  //       // fY = document.getElementById(`cell-${i}`).getBoundingClientRect().y
-  //     }
-  //     else if(cells[i] === ss){
-  //       sX = document.getElementById(`cell-${i}`).getBoundingClientRect().x - canvasRef.current.getBoundingClientRect().x;
-  //       sY = document.getElementById(`cell-${i}`).getBoundingClientRect().y - canvasRef.current.getBoundingClientRect().y;
-  //       // sX = document.getElementById(`cell-${i}`).getBoundingClientRect().x
-  //       // sY = document.getElementById(`cell-${i}`).getBoundingClientRect().y
-  //     }
-  //   }
-  //   // console.log({fX , fY , sX , sY});
-  //   // const canvas = document.getElementById
-  //   // ctx.clearRect(0 , 0 , 500 , 500);
-  //   ctx.beginPath();
-  //   //i = 0 -> y - 20
-  //   //i = 1 -> y + 20
-  //   ctx.moveTo(fX + 60, fY + offsetY );
-  //   ctx.lineTo(sX + 60, sY + offsetY);
-  //   ctx.stroke();
-  // }
-  // } , [bigramIndex])
+  useEffect(()=>{
+    for(let i = 0 ; i < 2 ; ++i){
+      document.getElementById(`arrow-${i}`)?.remove();
+    }
+    const vals = [bigramPl[bigramIndex] , cipherOutput[bigramIndex] , bigramPl[bigramIndex + 1] , cipherOutput[bigramIndex + 1]];
+    // console.log({vals});
+    //xy[i][j][k] = this is the ith pair of bigram and cipher (there are only 2)
+    //j = 0 means plaintext bigram j = 1 means ciphertext bigram 
+    // k = 0 means X coord, k = 1 means Y coord
+    const xy = [[[0,0],[0,0]],[[0,0],[0,0]]]
+    for(let i = 0 ; i < cells.length ; ++i){
+      for(let j = 0 ; j < vals.length ; ++j){
+        if(vals[j] === cells[i]){
+          xy[Number(j>=2)][j&1][0] = i%5;
+          xy[Number(j>=2)][j&1][1] = Math.floor(i/5);
+        }
+      }
+    } 
+    // console.log({
+    //   "bgF" : [xy[0][0][0] , xy[0][0][1]],
+    //   "ciF" : [xy[0][1][0] , xy[0][1][1]],
+    //   "bgS" : [xy[1][0][0] , xy[1][0][1]],
+    //   "ciS" : [xy[1][1][0] , xy[1][1][1]],
+    // })
+    for(let i = 0 ; i < 2 ; ++i){
+
+      let sameRowCase = 0 , adjColCase = 0 , adjColTopCase = 0 , adjRowRightCase = 0;
+      let leftOffset = Math.min(xy[i][0][0] , xy[i][1][0]) * 50
+      let topOffset = Math.min(xy[i][0][1] , xy[i][1][1]) * 50;
+      let height = (Math.abs(xy[i][0][1] - xy[i][1][1]) + 1) * 50;
+      let width = (Math.abs(xy[i][0][0] - xy[i][1][0]) + 1) * 50;
+      // if()
+      //same row , and checking adjacency
+      if(xy[i][0][1] === xy[i][1][1]){
+         sameRowCase = 1;
+         if(Math.abs(xy[i][0][0] - xy[i][1][0]) === 1){
+          adjColCase = 1;
+          leftOffset += 30;
+
+          //edge case : pair is on top row
+          if(xy[i][0][1] === 0){
+            topOffset += 50;
+            adjColTopCase = 1;
+          }
+          else topOffset -= 20;
+
+          height = 20;
+          width = 40;
+         }
+         else{
+          // console.log(`HEREEE , ${i}`);
+          leftOffset += 50; 
+          width -= 100;
+          height -= 25
+          // console.log({leftOffset , topOffset , height , width})
+         }
+      }
+      else{
+        if(xy[i][0][0] === 4){
+          leftOffset -= 20;
+          adjRowRightCase = 1;
+        }
+        else{
+          leftOffset += 50;
+        }
+          topOffset += 30;
+          height = 40;
+          width = 20; 
+      }
+
+      const arrow = document.createElement("div")
+      arrow.id = `arrow-${i}`
+      arrow.style.position = "absolute"
+      arrow.style.top = `${topOffset}px`
+      arrow.style.left = `${leftOffset}px`
+      arrow.style.height = `${height}px`
+      arrow.style.width = `${width}px`
+      arrow.style.border = "3px solid purple"
+      // arrow.style.backgroundColor = "rgba(255 , 0 , 0 , 0.2)"
+      if(sameRowCase){
+        if(adjColTopCase){
+          arrow.style.borderTop = "0"
+          arrow.style.borderBottomLeftRadius = "30px"
+          arrow.style.borderBottomRightRadius = "30px"
+        }
+        else if(adjColCase){
+          arrow.style.borderBottom = "0"
+          arrow.style.borderTopLeftRadius = "30px"
+          arrow.style.borderTopRightRadius = "30px"
+        }
+        else{
+          arrow.style.border = "0"
+          arrow.style.borderBottom = "3px solid purple"
+        }
+      }
+      else{
+        if(adjRowRightCase){
+          arrow.style.borderRight = "0"
+          arrow.style.borderTopLeftRadius = "30px"
+          arrow.style.borderBottomLeftRadius = "30px"
+        }
+        else{
+          arrow.style.borderLeft = "0"
+          arrow.style.borderTopRightRadius = "30px"
+          arrow.style.borderBottomRightRadius = "30px"
+        }
+      }
+      gridRef.current.appendChild(arrow)
+    }
+  } , [bigramIndex])
 
   let cleanedKey = [
     ...new Set(keyInput.replace(new RegExp(club, "g"), "I")),
@@ -132,7 +204,8 @@ const Grid = () => {
   }, [keyInput, plInput]);
 
   return (
-    <div id="grid" className="grid grid-cols-5 size-[250px] relative">
+    <>
+    <div id="grid" ref={gridRef} className="grid grid-cols-5 size-[250px] relative">
       {/* <canvas ref={canvasRef} className="absolute top-0 right-0 size-full" /> */}
       {cells.map((item, index) => {
         const isSelectedBigram = (item === f || item === s) && bigramIndex >= 0;
@@ -155,10 +228,10 @@ const Grid = () => {
                 keyFinished ? "bg-green-200" : "bg-slate-400"
               }
               ${
-                isSelectedBigram && " border-[2px] border-red-600 text-red-600"
+                isSelectedBigram && " border-[3px] border-red-600 "
               }
               ${
-                isTargetCell && " border-[2px] border-blue-700 text-blue-700"
+                isTargetCell && " border-[3px] border-blue-700 "
               }
               `
             }
@@ -168,10 +241,10 @@ const Grid = () => {
             isSelectedBigram && isTargetCell && (<div className="absolute inset-[1px] border-[2px] border-blue-700"></div>)
           }
           {
-            isSelectedBigram && isFirstIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs">1</span>)
+            isSelectedBigram && isFirstIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs text-red-600">1</span>)
           }
           {
-            isSelectedBigram && isSecondIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs">2</span>)
+            isSelectedBigram && isSecondIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs text-red-600">2</span>)
           }
           {
             isTargetCell && isFirstIndexTarget && (<span className="absolute top-[60%] right-[0%] bottom-[0%] left-[10%] text-xs text-blue-700">1</span>)
@@ -183,6 +256,8 @@ const Grid = () => {
         );
       })}
     </div>
+    <div className="h-[100px]"></div>
+    </>
   );
 };
 
