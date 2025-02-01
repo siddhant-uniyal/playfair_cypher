@@ -12,11 +12,8 @@ const Text = () => {
     setBigramIndex,
   } = useAppContext();
   const bigramPl = createBigramPl(plInput);
-  // if(plInput.length === 0) setBigramIndex(-1);
   return (
     <>
-      {/* <div id="text" className="w-screen text-center h-[250px] flex flex-col"> */}
-      {/* <div id="text" className="flex flex-col border border-red-100 h-[500px]"> */}
       <div id="text" className="flex flex-col h-[300px]">
         <div
           id="key-input"
@@ -66,7 +63,6 @@ const Text = () => {
         </label>
         <span
           id="bigram-list"
-          // className="text-center text-xl mt-[30px] flex flex-row gap-x-2 justify-center align-center"
           className="text-center text-xl"
         >
           {bigramPl.map((item, index) => {
@@ -100,11 +96,6 @@ const Text = () => {
             <label htmlFor="ciphertext" className="text-3xl">
               Ciphertext:
             </label>
-            {
-              // setCipherOutput((prevCipher)=>prevCipher.map((item , index) => (
-              //   if(index == bigramIndex)
-              // )));
-            }
             <span id="ciphertext" className="text-3xl">
               {cipherOutput.split("").map((item, index) => {
                 const isCorrespIndex =

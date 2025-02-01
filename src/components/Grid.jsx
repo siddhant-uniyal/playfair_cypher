@@ -24,14 +24,12 @@ function intializeCells(N) {
 const Grid = () => {
   const { keyInput, plInput, setCipherOutput, bigramIndex, cipherOutput } = useAppContext();
   const gridRef = useRef(null);
-  // console.log(bigramIndex);
   const bigramPl = createBigramPl(plInput);
   const N = 5;
   const club = "J";
   const f = bigramPl[bigramIndex] == 'J' ? 'I' : bigramPl[bigramIndex],
     s = bigramPl[bigramIndex + 1] == 'J' ? 'I' : bigramPl[bigramIndex + 1];
 
-  // console.log({ f, s });
   const [cells, setCells] = useState(() => intializeCells(N));
   const updateCell = (index, element) => {
     setCells((prevCells) =>
@@ -44,7 +42,6 @@ const Grid = () => {
       document.getElementById(`arrow-${i}`)?.remove();
     }
     const vals = [bigramPl[bigramIndex] , cipherOutput[bigramIndex] , bigramPl[bigramIndex + 1] , cipherOutput[bigramIndex + 1]];
-    // console.log({vals});
     //xy[i][j][k] = this is the ith pair of bigram and cipher (there are only 2)
     //j = 0 means plaintext bigram j = 1 means ciphertext bigram 
     // k = 0 means X coord, k = 1 means Y coord
@@ -57,12 +54,6 @@ const Grid = () => {
         }
       }
     } 
-    // console.log({
-    //   "bgF" : [xy[0][0][0] , xy[0][0][1]],
-    //   "ciF" : [xy[0][1][0] , xy[0][1][1]],
-    //   "bgS" : [xy[1][0][0] , xy[1][0][1]],
-    //   "ciS" : [xy[1][1][0] , xy[1][1][1]],
-    // })
     for(let i = 0 ; i < 2 ; ++i){
 
       let sameRowCase = 0 , adjColCase = 0 , adjColTopCase = 0 , adjRowRightCase = 0;
@@ -70,7 +61,6 @@ const Grid = () => {
       let topOffset = Math.min(xy[i][0][1] , xy[i][1][1]) * 50;
       let height = (Math.abs(xy[i][0][1] - xy[i][1][1]) + 1) * 50;
       let width = (Math.abs(xy[i][0][0] - xy[i][1][0]) + 1) * 50;
-      // if()
       //same row , and checking adjacency
       if(xy[i][0][1] === xy[i][1][1]){
          sameRowCase = 1;
@@ -79,7 +69,7 @@ const Grid = () => {
           leftOffset += 30;
 
           //edge case : pair is on top row
-          if(xy[i][0][1] === 0){
+          if(xy[i][0][1] === 0){      
             topOffset += 50;
             adjColTopCase = 1;
           }
@@ -89,11 +79,9 @@ const Grid = () => {
           width = 40;
          }
          else{
-          // console.log(`HEREEE , ${i}`);
           leftOffset += 50; 
           width -= 100;
           height -= 25
-          // console.log({leftOffset , topOffset , height , width})
          }
       }
       else{
@@ -117,7 +105,6 @@ const Grid = () => {
       arrow.style.height = `${height}px`
       arrow.style.width = `${width}px`
       arrow.style.border = "3px solid purple"
-      // arrow.style.backgroundColor = "rgba(255 , 0 , 0 , 0.2)"
       if(sameRowCase){
         if(adjColTopCase){
           arrow.style.borderTop = "0"
@@ -206,12 +193,10 @@ const Grid = () => {
   return (
     <>
     <div id="grid" ref={gridRef} className="grid grid-cols-5 size-[250px] relative">
-      {/* <canvas ref={canvasRef} className="absolute top-0 right-0 size-full" /> */}
       {cells.map((item, index) => {
         const isSelectedBigram = (item === f || item === s) && bigramIndex >= 0;
         const keyFinished = index < cleanedKey.length;
-        const isTargetCell =
-          (item === cipherOutput[bigramIndex] ||
+        const isTargetCell = (item === cipherOutput[bigramIndex] ||
             item === cipherOutput[bigramIndex + 1]) &&
           bigramIndex >= 0;
         const isFirstIndexBigram = item === f && bigramIndex >= 0;
@@ -241,16 +226,10 @@ const Grid = () => {
             isSelectedBigram && isTargetCell && (<div className="absolute inset-[1px] border-[2px] border-blue-700"></div>)
           }
           {
-            isSelectedBigram && isFirstIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs text-red-600">1</span>)
+            isSelectedBigram && (isFirstIndexBigram || isSecondIndexBigram) && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs text-red-600">{isFirstIndexBigram ? '1' : '2'}</span>)
           }
           {
-            isSelectedBigram && isSecondIndexBigram && (<span className="absolute top-[0%] right-[0%] bottom-[70%] left-[80%] text-xs text-red-600">2</span>)
-          }
-          {
-            isTargetCell && isFirstIndexTarget && (<span className="absolute top-[60%] right-[0%] bottom-[0%] left-[10%] text-xs text-blue-700">1</span>)
-          }
-          {
-            isTargetCell && isSecondIndexTarget && (<span className="absolute top-[60%] right-[0%] bottom-[0%] left-[10%] text-xs text-blue-700">2</span>)
+            isTargetCell && (isFirstIndexTarget || isSecondIndexTarget) && (<span className="absolute top-[60%] right-[0%] bottom-[0%] left-[10%] text-xs text-blue-700">{isFirstIndexTarget ? '1' : '2'}</span>)
           }
           </div>
         );
