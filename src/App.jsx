@@ -10,7 +10,6 @@ const App = () => {
       <AppContextProvider>
         <Text />
         <Grid></Grid>
-        <Bigram></Bigram>
       </AppContextProvider>
       
     </div>
