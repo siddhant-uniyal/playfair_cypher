@@ -27,8 +27,7 @@ const Grid = () => {
   const bigramPl = createBigramPl(plInput);
   const N = 5;
   const club = "J";
-  const f = bigramPl[bigramIndex] == 'J' ? 'I' : bigramPl[bigramIndex],
-    s = bigramPl[bigramIndex + 1] == 'J' ? 'I' : bigramPl[bigramIndex + 1];
+  const f = bigramPl[bigramIndex], s = bigramPl[bigramIndex + 1];
 
   const [cells, setCells] = useState(() => intializeCells(N));
   const updateCell = (index, element) => {
@@ -41,9 +40,10 @@ const Grid = () => {
     for(let i = 0 ; i < 2 ; ++i){
       document.getElementById(`arrow-${i}`)?.remove();
     }
+    if(bigramIndex === -1) return;
     const vals = [bigramPl[bigramIndex] , cipherOutput[bigramIndex] , bigramPl[bigramIndex + 1] , cipherOutput[bigramIndex + 1]];
     //xy[i][j][k] = this is the ith pair of bigram and cipher (there are only 2)
-    //j = 0 means plaintext bigram j = 1 means ciphertext bigram 
+    //j = 0 means plaintext bigram , j = 1 means ciphertext bigram 
     // k = 0 means X coord, k = 1 means Y coord
     const xy = [[[0,0],[0,0]],[[0,0],[0,0]]]
     for(let i = 0 ; i < cells.length ; ++i){
@@ -138,7 +138,7 @@ const Grid = () => {
   } , [bigramIndex])
 
   let cleanedKey = [
-    ...new Set(keyInput.replace(new RegExp(club, "g"), "I")),
+    ...new Set(keyInput.replace(/J/g, "I")),
   ].join("");
 
   useEffect(() => {
@@ -199,8 +199,8 @@ const Grid = () => {
         const isTargetCell = (item === cipherOutput[bigramIndex] ||
             item === cipherOutput[bigramIndex + 1]) &&
           bigramIndex >= 0;
-        const isFirstIndexBigram = item === f && bigramIndex >= 0;
-        const isSecondIndexBigram = item === s && bigramIndex >= 0;
+        const isFirstIndexBigram = bigramIndex >= 0 && item === f;
+        const isSecondIndexBigram = bigramIndex >= 0 && item === s;
         const isFirstIndexTarget = bigramIndex >= 0 && item === cipherOutput[bigramIndex];
         const isSecondIndexTarget = bigramIndex >= 0 && item === cipherOutput[bigramIndex + 1];
         return (

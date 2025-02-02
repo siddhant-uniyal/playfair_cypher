@@ -29,9 +29,11 @@ const Text = () => {
             className="border border-black rounded-xl text-3xl"
             value={keyInput}
             placeholder="Enter key"
-            onChange={(e) =>
+            onChange={(e) => {
+              setBigramIndex(-1);
               /^[a-zA-Z]*$/.test(e.target.value) &&
               setKeyInput(e.target.value.toUpperCase())
+            }
             }
           />
         </div>
@@ -49,9 +51,11 @@ const Text = () => {
             className="border border-black rounded-xl text-3xl"
             value={plInput}
             placeholder="Enter plaintext"
-            onChange={(e) =>
+            onChange={(e) =>{
+              setBigramIndex(-1);
               /^[a-zA-Z]*$/.test(e.target.value) &&
               setPlInput(e.target.value.toUpperCase())
+            }
             }
           />
         </div>
@@ -67,12 +71,12 @@ const Text = () => {
         >
           {bigramPl.map((item, index) => {
             const isSelectedBigram =
-              index === bigramIndex || index === bigramIndex + 1;
+              bigramIndex >= 0 && (index === bigramIndex || index === bigramIndex + 1);
             return (
               !(index & 1) && (
                 <button
                   key={index}
-                  onClick={() => setBigramIndex(index)}
+                  onClick={() => setBigramIndex((prev) => setBigramIndex(prev === index ? -1 : index))}
                   className={`hover:cursor-pointer ${
                     isSelectedBigram && " text-red-500 font-bold underline"
                   }`}
@@ -99,8 +103,8 @@ const Text = () => {
             <span id="ciphertext" className="text-3xl">
               {cipherOutput.split("").map((item, index) => {
                 const isCorrespIndex =
-                  (bigramIndex >= 0 && index === bigramIndex) ||
-                  index === bigramIndex + 1;
+                  bigramIndex >= 0 && (index === bigramIndex ||
+                  index === bigramIndex + 1)
                 const isFirstIndexBigram =
                   bigramIndex >= 0 && index === bigramIndex;
                 const isSecondIndexBigram =
